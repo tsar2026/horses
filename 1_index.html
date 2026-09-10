@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>6 Horses — Shipping Manifest</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --hull: #12171d;
+    --hull-2: #191f27;
+    --parchment: #ece2c8;
+    --parchment-dim: #d9cca8;
+    --ink: #26301f;
+    --rust: #9c4a2b;
+    --rust-dim: #7a3a21;
+    --brass: #b8925a;
+    --sage: #5f7156;
+    --muted: #8b95a0;
+    --paper-muted: #7d735a;
+    --line: #2a323d;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--hull);
+    background-image:
+      radial-gradient(ellipse at top right, rgba(184,146,90,0.06), transparent 55%),
+      repeating-linear-gradient(180deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+    color: var(--parchment);
+    font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height:100vh;
+  }
+
+  /* ---------- Header / manifest banner ---------- */
+  .manifest-head{
+    position:relative;
+    border-bottom: 2px solid var(--line);
+    padding: clamp(22px,4vw,40px) clamp(20px,5vw,44px) clamp(18px,3vw,28px);
+    overflow:hidden;
+  }
+  .horseshoe-mark{
+    position:absolute;
+    right: clamp(-30px, -2vw, 10px);
+    top: -20px;
+    width: 220px;
+    height: 220px;
+    opacity: 0.05;
+    pointer-events:none;
+  }
+  .head-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:24px;
+    flex-wrap:wrap;
+    position:relative;
+    z-index:1;
+  }
+  .title-block h1{
+    font-family:'Roboto Slab', serif;
+    font-weight:700;
+    font-size: clamp(24px, 4vw, 34px);
+    margin:0 0 4px;
+    color: var(--parchment);
+    letter-spacing:.2px;
+  }
+  .title-block .subtitle{
+    font-family:'Roboto Slab', serif;
+    font-weight:500;
+    font-size: 14px;
+    color: var(--brass);
+    margin:0;
+  }
+
+  .stamp{
+    flex-shrink:0;
+    border: 2px solid var(--rust);
+    border-radius: 3px;
+    padding: 10px 16px;
+    transform: rotate(-3deg);
+    color: var(--rust);
+    position:relative;
+    animation: stamp-in .5s cubic-bezier(.2,1.4,.4,1) both;
+    filter: url(#stampGrain);
+  }
+  .stamp::before{
+    content:"";
+    position:absolute;
+    inset:3px;
+    border:1px solid var(--rust);
+    border-radius:2px;
+    opacity:.6;
+  }
+  .stamp .stamp-line{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.5px;
+    white-space:nowrap;
+    line-height:1.7;
+  }
+  .stamp .stamp-line b{ color: var(--rust-dim); font-weight:600; }
+
+  @keyframes stamp-in{
+    0%{ transform: rotate(-3deg) scale(1.6); opacity:0; }
+    70%{ opacity:1; }
+    100%{ transform: rotate(-3deg) scale(1); opacity:1; }
+  }
+
+  .route-line{
+    margin-top:18px;
+    font-size:13px;
+    color: var(--muted);
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:6px;
+    position:relative;
+    z-index:1;
+  }
+  .route-line .label{ color: var(--sage); }
+  .route-line a{ color: var(--parchment); text-decoration:none; border-bottom:1px dotted var(--line); }
+  .route-line a:hover{ border-bottom-color: var(--brass); color: var(--brass); }
+  .route-line .sep{ color: var(--line); }
+
+  /* ---------- Ledger / listing ---------- */
+  main{
+    max-width: 860px;
+    margin: 0 auto;
+    padding: clamp(20px,4vw,36px) clamp(20px,5vw,44px) 70px;
+  }
+
+  #status{
+    color: var(--muted);
+    padding: 28px 4px;
+    font-size:14px;
+  }
+  #status.error{ color: #c97a63; }
+
+  .ledger{
+    background: var(--parchment);
+    color: var(--ink);
+    border-radius: 6px;
+    overflow:hidden;
+    box-shadow: 0 18px 40px -20px rgba(0,0,0,0.55);
+  }
+  .ledger-heading{
+    display:flex;
+    justify-content:space-between;
+    padding: 10px 20px;
+    font-size:11px;
+    letter-spacing:.4px;
+    color: var(--paper-muted);
+    border-bottom: 1px solid rgba(38,48,31,0.15);
+    background: var(--parchment-dim);
+  }
+  ul.rows{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  li.row{
+    border-bottom: 1px solid rgba(38,48,31,0.12);
+  }
+  li.row:last-child{ border-bottom:none; }
+  li.row a{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding: 13px 20px;
+    color: var(--ink);
+    text-decoration:none;
+  }
+  li.row a:hover{ background: rgba(38,48,31,0.06); }
+  .icon{ flex-shrink:0; width:22px; height:22px; }
+  .icon.crate{ color: var(--sage); }
+  .icon.tag{ color: var(--rust-dim); }
+  .name{
+    flex:1;
+    word-break: break-word;
+    font-size:14px;
+  }
+  .name.dir{ font-weight:600; }
+  .weight{
+    font-size:12px;
+    color: var(--paper-muted);
+    flex-shrink:0;
+    min-width:64px;
+    text-align:right;
+  }
+
+  footer{
+    max-width:860px;
+    margin: 22px auto 0;
+    padding: 0 clamp(20px,5vw,44px);
+    color: var(--muted);
+    font-size:11px;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 620px){
+    .head-row{ flex-direction:column; }
+    .stamp{ align-self:flex-start; transform: rotate(-2deg) scale(0.94); transform-origin: left top; }
+    .ledger-heading .weight-col{ display:none; }
+    .weight{ min-width:auto; }
+    li.row a{ padding: 12px 14px; gap:10px; }
+    .name{ font-size:13.5px; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <filter id="stampGrain">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="noise"/>
+    <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.35 0" result="grain"/>
+    <feComposite in="SourceGraphic" in2="grain" operator="in" result="grained"/>
+    <feMerge>
+      <feMergeNode in="grained"/>
+    </feMerge>
+  </filter>
+</svg>
+
+<div class="manifest-head">
+  <svg class="horseshoe-mark" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6">
+    <path d="M28 90 L32 55 A22 22 0 0 1 68 55 L72 90" stroke-linecap="round"/>
+    <circle cx="30" cy="90" r="3" fill="currentColor" stroke="none"/>
+    <circle cx="70" cy="90" r="3" fill="currentColor" stroke="none"/>
+    <circle cx="27" cy="72" r="3" fill="currentColor" stroke="none"/>
+    <circle cx="73" cy="72" r="3" fill="currentColor" stroke="none"/>
+  </svg>
+
+  <div class="head-row">
+    <div class="title-block">
+      <h1>6 Horses</h1>
+      <p class="subtitle">Shipping Manifest — Team Cargo Index</p>
+    </div>
+    <div class="stamp">
+      <div class="stamp-line"><b>SHPMT&nbsp;NO.</b> <span id="stampRepo">6HORSES</span></div>
+      <div class="stamp-line"><b>HOLD</b> <span id="stampBranch">MAIN</span></div>
+    </div>
+  </div>
+
+  <div class="route-line" id="breadcrumb">
+    <span class="label">Route:</span>
+  </div>
+</div>
+
+<main>
+  <div id="status">Loading manifest…</div>
+  <div class="ledger" id="ledgerWrap" style="display:none">
+    <div class="ledger-heading">
+      <span>Consignment</span>
+      <span class="weight-col">Weight</span>
+    </div>
+    <ul class="rows" id="listing"></ul>
+  </div>
+</main>
+
+<footer>Pulled live from GitHub · refreshes on every visit</footer>
+
+<script>
+/* ====== EDIT THESE THREE VALUES FOR YOUR REPO ====== */
+const OWNER  = "tsar2026";   // your GitHub username
+const REPO   = "horses";        // your repository name
+const BRANCH = "main";           // branch to read from
+/* ==================================================== */
+
+document.getElementById("stampRepo").textContent = REPO.toUpperCase();
+document.getElementById("stampBranch").textContent = BRANCH.toUpperCase();
+
+const params = new URLSearchParams(location.search);
+const currentPath = params.get("path") || "";
+
+const listingEl = document.getElementById("listing");
+const statusEl = document.getElementById("status");
+const ledgerWrap = document.getElementById("ledgerWrap");
+const crumbEl = document.getElementById("breadcrumb");
+
+const CRATE_ICON = `<svg class="icon crate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8l9-4 9 4-9 4-9-4z"/><path d="M3 8v8l9 4 9-4V8"/><path d="M12 12v8"/></svg>`;
+const TAG_ICON = `<svg class="icon tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12.5 3.5h5a1 1 0 0 1 .7.3l5 5a1 1 0 0 1 0 1.4l-9 9a1 1 0 0 1-1.4 0l-5-5a1 1 0 0 1-.3-.7v-5a1 1 0 0 1 .3-.7l4-4a1 1 0 0 1 .7-.3z"/><circle cx="16.5" cy="7.5" r="1.4" fill="currentColor" stroke="none"/></svg>`;
+
+function humanSize(bytes){
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + " KB";
+  return (bytes/(1024*1024)).toFixed(1) + " MB";
+}
+
+function buildBreadcrumb(path){
+  const parts = path ? path.split("/") : [];
+  let html = `<span class="label">Route:</span> <a href="?path=">${REPO}</a>`;
+  let acc = "";
+  parts.forEach(part => {
+    acc += (acc ? "/" : "") + part;
+    html += `<span class="sep">/</span><a href="?path=${encodeURIComponent(acc)}">${part}</a>`;
+  });
+  crumbEl.innerHTML = html;
+}
+
+async function loadListing(path){
+  buildBreadcrumb(path);
+  const apiUrl = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`;
+
+  try {
+    const res = await fetch(apiUrl);
+    if (!res.ok) throw new Error(`GitHub API returned ${res.status}`);
+    const items = await res.json();
+    if (!Array.isArray(items)) throw new Error("Not a folder");
+
+    items.sort((a,b) => {
+      if (a.type !== b.type) return a.type === "dir" ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    });
+
+    if (items.length === 0){
+      statusEl.textContent = "Empty hold — nothing shipped here yet.";
+      statusEl.className = "";
+      ledgerWrap.style.display = "none";
+      return;
+    }
+
+    listingEl.innerHTML = items.map(item => {
+      if (item.type === "dir"){
+        const newPath = path ? `${path}/${item.name}` : item.name;
+        return `<li class="row"><a href="?path=${encodeURIComponent(newPath)}">
+          ${CRATE_ICON}
+          <span class="name dir">${item.name}/</span>
+        </a></li>`;
+      } else {
+        return `<li class="row"><a href="${item.download_url}" target="_blank" rel="noopener">
+          ${TAG_ICON}
+          <span class="name">${item.name}</span>
+          <span class="weight">${humanSize(item.size)}</span>
+        </a></li>`;
+      }
+    }).join("");
+
+    statusEl.style.display = "none";
+    ledgerWrap.style.display = "block";
+  } catch (err){
+    statusEl.textContent = `Manifest couldn't be read (${err.message}). Check OWNER/REPO/BRANCH at the top of the script, and that the repo is public.`;
+    statusEl.className = "error";
+    ledgerWrap.style.display = "none";
+  }
+}
+
+loadListing(currentPath);
+</script>
+
+</body>
+</html>
